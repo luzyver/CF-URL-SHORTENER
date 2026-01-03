@@ -2,22 +2,10 @@ name = "cf-url-shortener"
 main = "src/index.js"
 compatibility_date = "2026-01-03"
 
-# KV Namespace binding
-# Jalankan: wrangler kv:namespace create "LINKS" untuk membuat namespace
-# Lalu update id di bawah dengan id yang didapat
+routes = [
+  { pattern = "lzvr.biz.id/*", zone_name = "lzvr.biz.id" }
+]
+
 [[kv_namespaces]]
 binding = "LINKS"
 id = "your-kv-namespace-id-here"
-
-# Preview KV untuk development
-# Jalankan: wrangler kv:namespace create "LINKS" --preview
-# preview_id = "your-preview-kv-namespace-id-here"
-
-# [vars]
-# Uncomment jika perlu menambahkan environment variables
-# EXAMPLE_VAR = "value"
-
-# ADMIN_API_KEY diset sebagai secret (lebih aman)
-# Jalankan: npx wrangler secret put ADMIN_API_KEY
-# Atau set via GitHub Actions secrets
-
