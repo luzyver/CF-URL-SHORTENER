@@ -9,3 +9,6 @@ routes = [
 [[kv_namespaces]]
 binding = "LINKS"
 id = "your-kv-namespace-id-here"
+
+[vars]
+TURNSTILE_SITE_KEY = ""

@@ -8,6 +8,7 @@ import {
   handleCheckRemaining,
   handleStats,
 } from './handlers.js';
+import { requireTurnstile, handleTurnstileVerify } from './turnstile.js';
 
 export default {
   async fetch(request, env, ctx) {
@@ -19,6 +20,19 @@ export default {
     }
 
     try {
+      if (path === '/api/turnstile/verify' && request.method === 'POST') {
+        return await handleTurnstileVerify(request, env);
+      }
+
+      const isApiRoute = path.startsWith('/api/');
+      
+      if (!isApiRoute || path === '/api/shorten' || path === '/api/remaining') {
+        const turnstileResponse = await requireTurnstile(request, env);
+        if (turnstileResponse) {
+          return turnstileResponse;
+        }
+      }
+
       if (path === '/' || path === '/admin') {
         return new Response(getAdminHTML(), {
           headers: { 'Content-Type': 'text/html; charset=utf-8' },
