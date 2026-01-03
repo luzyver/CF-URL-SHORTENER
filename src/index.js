@@ -1,4 +1,5 @@
 import { corsHeaders } from './utils.js';
+import { getHomeHTML } from './html/home.js';
 import { getAdminHTML } from './html/admin.js';
 import {
   handleShorten,
@@ -24,7 +25,17 @@ export default {
         return await handleTurnstileVerify(request, env);
       }
 
-      if (path === '/' || path === '/admin') {
+      if (path === '/') {
+        const turnstileResponse = await requireTurnstile(request, env);
+        if (turnstileResponse) {
+          return turnstileResponse;
+        }
+        return new Response(getHomeHTML(), {
+          headers: { 'Content-Type': 'text/html; charset=utf-8' },
+        });
+      }
+
+      if (path === '/admin') {
         const turnstileResponse = await requireTurnstile(request, env);
         if (turnstileResponse) {
           return turnstileResponse;

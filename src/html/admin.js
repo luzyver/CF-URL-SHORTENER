@@ -4,7 +4,7 @@ export function getAdminHTML() {
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>CF-URL-Shortener | URL Shortener</title>
+  <title>Admin - CF-URL-Shortener</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
@@ -22,8 +22,6 @@ export function getAdminHTML() {
       --border: #2a2a3a;
       --danger: #ff4466;
       --danger-dim: #ff446633;
-      --success: #00ff88;
-      --warning: #ffaa00;
     }
     * { margin: 0; padding: 0; box-sizing: border-box; }
     body {
@@ -55,7 +53,6 @@ export function getAdminHTML() {
       border-radius: 16px;
       padding: 30px;
       margin-bottom: 30px;
-      backdrop-filter: blur(10px);
     }
     .card-title {
       font-family: 'JetBrains Mono', monospace;
@@ -76,9 +73,7 @@ export function getAdminHTML() {
       border-radius: 50%;
       box-shadow: 0 0 10px var(--accent);
     }
-    .form-group { margin-bottom: 20px; }
-    label { display: block; font-size: 0.9rem; color: var(--text-secondary); margin-bottom: 8px; font-weight: 500; }
-    input, select {
+    input {
       width: 100%;
       padding: 14px 18px;
       background: var(--bg-tertiary);
@@ -89,14 +84,12 @@ export function getAdminHTML() {
       font-size: 0.95rem;
       transition: all 0.3s ease;
     }
-    input:focus, select:focus {
+    input:focus {
       outline: none;
       border-color: var(--accent);
       box-shadow: 0 0 0 3px var(--accent-dim);
     }
     input::placeholder { color: var(--text-muted); }
-    .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
-    @media (max-width: 600px) { .form-row { grid-template-columns: 1fr; } }
     .btn {
       padding: 14px 28px;
       border: none;
@@ -113,7 +106,6 @@ export function getAdminHTML() {
     .btn-primary {
       background: linear-gradient(135deg, var(--accent), #00cc66);
       color: var(--bg-primary);
-      width: 100%;
       justify-content: center;
     }
     .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 10px 30px var(--accent-dim); }
@@ -121,29 +113,9 @@ export function getAdminHTML() {
     .btn-danger:hover { background: var(--danger); color: white; }
     .btn-copy { background: var(--bg-tertiary); color: var(--text-secondary); padding: 8px 14px; font-size: 0.85rem; }
     .btn-copy:hover { background: var(--accent-dim); color: var(--accent); }
-    .api-key-section { display: flex; gap: 15px; margin-bottom: 30px; }
+    .api-key-section { display: flex; gap: 15px; }
     .api-key-section input { flex: 1; }
     .api-key-section .btn { white-space: nowrap; }
-    .result {
-      display: none;
-      background: var(--bg-tertiary);
-      border: 1px solid var(--accent);
-      border-radius: 10px;
-      padding: 20px;
-      margin-top: 20px;
-    }
-    .result.show { display: block; animation: slideIn 0.3s ease; }
-    @keyframes slideIn { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
-    .result-url {
-      font-family: 'JetBrains Mono', monospace;
-      font-size: 1.1rem;
-      color: var(--accent);
-      word-break: break-all;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 15px;
-    }
     .links-table { width: 100%; border-collapse: collapse; }
     .links-table th {
       text-align: left;
@@ -195,65 +167,28 @@ export function getAdminHTML() {
     .stat-card { background: var(--bg-tertiary); border-radius: 12px; padding: 20px; text-align: center; }
     .stat-value { font-family: 'JetBrains Mono', monospace; font-size: 2rem; font-weight: 700; color: var(--accent); }
     .stat-label { font-size: 0.85rem; color: var(--text-muted); margin-top: 5px; }
+    .back-link { display: inline-block; color: var(--text-secondary); text-decoration: none; margin-bottom: 30px; font-size: 0.9rem; }
+    .back-link:hover { color: var(--accent); }
   </style>
 </head>
 <body>
   <div class="container">
+    <a href="/" class="back-link">&larr; Back to Home</a>
+    
     <header>
       <h1 class="logo">&lt;/shorted&gt;</h1>
-      <p class="tagline">Lightning-fast URL shortener powered by Cloudflare Workers</p>
+      <p class="tagline">Admin Panel</p>
     </header>
 
     <div class="card">
-      <div class="card-title">Create Short Link</div>
-      <p id="remainingInfo" style="color: var(--text-secondary); margin-bottom: 20px; font-size: 0.9rem;">
-        ⚡ Free to use! Max <strong style="color: var(--accent);">5 links per day</strong>
-      </p>
-      <form id="shortenForm">
-        <div class="form-group">
-          <label>Destination URL</label>
-          <input type="url" id="url" placeholder="https://example.com/your-long-url" required />
-        </div>
-        <div class="form-row">
-          <div class="form-group">
-            <label>Custom Slug (optional)</label>
-            <input type="text" id="customSlug" placeholder="my-custom-link" pattern="[a-zA-Z0-9-_]+" />
-          </div>
-          <div class="form-group">
-            <label>Expires In</label>
-            <select id="expiresIn">
-              <option value="">Never</option>
-              <option value="3600">1 Hour</option>
-              <option value="86400">1 Day</option>
-              <option value="604800">1 Week</option>
-              <option value="2592000">1 Month</option>
-            </select>
-          </div>
-        </div>
-        <button type="submit" class="btn btn-primary">
-          <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1"></path>
-          </svg>
-          Shorten URL
-        </button>
-      </form>
-      <div class="result" id="result">
-        <div class="result-url">
-          <span id="shortUrl"></span>
-          <button class="btn btn-copy" onclick="copyUrl()">Copy</button>
-        </div>
-      </div>
-    </div>
-
-    <div class="card">
-      <div class="card-title">Admin Panel</div>
+      <div class="card-title">Authentication</div>
       <p style="color: var(--text-secondary); margin-bottom: 15px; font-size: 0.9rem;">
-        🔐 Enter API key to manage all links
+        Enter API key to manage all links
       </p>
-      <div class="api-key-section" style="margin-bottom: 0;">
+      <div class="api-key-section">
         <input type="password" id="apiKey" placeholder="Enter Admin API Key..." />
         <button class="btn btn-copy" onclick="toggleApiKey()">Show</button>
-        <button class="btn btn-primary" style="width: auto;" onclick="loadLinks()">Connect</button>
+        <button class="btn btn-primary" onclick="loadLinks()">Connect</button>
       </div>
     </div>
 
@@ -274,7 +209,7 @@ export function getAdminHTML() {
           <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1"></path>
           </svg>
-          <p>No links yet or still loading...</p>
+          <p>Loading...</p>
         </div>
       </div>
     </div>
@@ -283,77 +218,6 @@ export function getAdminHTML() {
   <div class="toast" id="toast"></div>
 
   <script>
-    let browserFingerprint = null;
-
-    async function generateFingerprint() {
-      const components = [];
-      components.push(screen.width + 'x' + screen.height);
-      components.push(screen.colorDepth);
-      components.push(window.devicePixelRatio || 1);
-      components.push(Intl.DateTimeFormat().resolvedOptions().timeZone);
-      components.push(navigator.language);
-      components.push(navigator.languages?.join(',') || '');
-      components.push(navigator.platform);
-      components.push(navigator.hardwareConcurrency || 0);
-      components.push(navigator.userAgent);
-      try {
-        const canvas = document.createElement('canvas');
-        const ctx = canvas.getContext('2d');
-        canvas.width = 200;
-        canvas.height = 50;
-        ctx.textBaseline = 'top';
-        ctx.font = '14px Arial';
-        ctx.fillStyle = '#f60';
-        ctx.fillRect(0, 0, 100, 50);
-        ctx.fillStyle = '#069';
-        ctx.fillText('Fingerprint', 2, 15);
-        ctx.fillStyle = 'rgba(102, 204, 0, 0.7)';
-        ctx.fillText('Canvas', 4, 30);
-        components.push(canvas.toDataURL());
-      } catch (e) {
-        components.push('canvas-error');
-      }
-      try {
-        const canvas = document.createElement('canvas');
-        const gl = canvas.getContext('webgl') || canvas.getContext('experimental-webgl');
-        if (gl) {
-          const debugInfo = gl.getExtension('WEBGL_debug_renderer_info');
-          if (debugInfo) {
-            components.push(gl.getParameter(debugInfo.UNMASKED_VENDOR_WEBGL));
-            components.push(gl.getParameter(debugInfo.UNMASKED_RENDERER_WEBGL));
-          }
-        }
-      } catch (e) {
-        components.push('webgl-error');
-      }
-      const data = components.join('|||');
-      const encoder = new TextEncoder();
-      const hashBuffer = await crypto.subtle.digest('SHA-256', encoder.encode(data));
-      const hashArray = Array.from(new Uint8Array(hashBuffer));
-      return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
-    }
-
-    async function checkRemaining() {
-      if (!browserFingerprint) return;
-      try {
-        const response = await fetch('/api/remaining', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ fingerprint: browserFingerprint })
-        });
-        const data = await response.json();
-        if (response.ok) {
-          document.getElementById('remainingInfo').innerHTML = 
-            'You have <strong style="color: var(--accent);">' + data.remaining + '</strong> of ' + data.limit + ' links remaining today';
-        }
-      } catch (e) {}
-    }
-
-    document.addEventListener('DOMContentLoaded', async () => {
-      browserFingerprint = await generateFingerprint();
-      await checkRemaining();
-    });
-
     function toggleApiKey() {
       const input = document.getElementById('apiKey');
       const btn = event.target;
@@ -377,47 +241,6 @@ export function getAdminHTML() {
       setTimeout(() => { toast.className = 'toast'; }, 3000);
     }
 
-    document.getElementById('shortenForm').addEventListener('submit', async (e) => {
-      e.preventDefault();
-      const url = document.getElementById('url').value;
-      const customSlug = document.getElementById('customSlug').value;
-      const expiresIn = document.getElementById('expiresIn').value;
-      const btn = e.target.querySelector('button[type="submit"]');
-      btn.innerHTML = '<span class="loading"></span>';
-      btn.disabled = true;
-      try {
-        const response = await fetch('/api/shorten', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            url,
-            customSlug: customSlug || undefined,
-            expiresIn: expiresIn ? parseInt(expiresIn) : undefined,
-            fingerprint: browserFingerprint
-          })
-        });
-        const data = await response.json();
-        if (!response.ok) throw new Error(data.error || 'Failed to shorten URL');
-        document.getElementById('shortUrl').textContent = data.shortUrl;
-        document.getElementById('result').classList.add('show');
-        const remainingMsg = data.remaining !== undefined ? ' (' + data.remaining + ' remaining today)' : '';
-        showToast('Short link created!' + remainingMsg);
-        if (data.remaining !== undefined) {
-          document.getElementById('remainingInfo').innerHTML = 
-            'You have <strong style="color: var(--accent);">' + data.remaining + '</strong> of 5 links remaining today';
-        }
-        document.getElementById('url').value = '';
-        document.getElementById('customSlug').value = '';
-        document.getElementById('expiresIn').value = '';
-        if (document.getElementById('linksCard').style.display !== 'none') loadLinks();
-      } catch (error) {
-        showToast(error.message, true);
-      } finally {
-        btn.innerHTML = '<svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1"></path></svg> Shorten URL';
-        btn.disabled = false;
-      }
-    });
-
     async function loadLinks() {
       const linksCard = document.getElementById('linksCard');
       const container = document.getElementById('linksContainer');
@@ -429,7 +252,7 @@ export function getAdminHTML() {
         if (!response.ok) throw new Error(data.error || 'Failed to load links');
         const links = data.links;
         if (links.length === 0) {
-          container.innerHTML = '<div class="empty-state"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1"></path></svg><p>No links yet. Create your first short link above!</p></div>';
+          container.innerHTML = '<div class="empty-state"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1"></path></svg><p>No links yet.</p></div>';
           document.getElementById('statsGrid').style.display = 'none';
           return;
         }
@@ -480,11 +303,6 @@ export function getAdminHTML() {
 
     function copyLink(slug) {
       navigator.clipboard.writeText(window.location.origin + '/' + slug);
-      showToast('Link copied to clipboard!');
-    }
-
-    function copyUrl() {
-      navigator.clipboard.writeText(document.getElementById('shortUrl').textContent);
       showToast('Link copied to clipboard!');
     }
   </script>
