@@ -98,7 +98,8 @@ export function getTurnstileHTML(siteKey) {
       fetch('/api/turnstile/verify', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ token })
+        body: JSON.stringify({ token }),
+        credentials: 'same-origin'
       })
       .then(res => res.json())
       .then(data => {
