@@ -217,14 +217,30 @@ export function getHomeHTML() {
     </div>
 
     <div class="footer">
-      <a href="/admin">Admin Panel</a>
+      <a href="/admin" id="adminLink">Admin Panel</a>
     </div>
   </div>
 
   <div class="toast" id="toast"></div>
 
   <script>
+    const SESSION_KEY = 'ts_session_token';
     let browserFingerprint = null;
+
+    function handleSessionToken() {
+      const params = new URLSearchParams(window.location.search);
+      const token = params.get('_ts');
+      if (token) {
+        try { localStorage.setItem(SESSION_KEY, token); } catch(e) {}
+        params.delete('_ts');
+        const newUrl = window.location.pathname + (params.toString() ? '?' + params.toString() : '');
+        window.history.replaceState({}, '', newUrl);
+      }
+    }
+
+    function getSessionToken() {
+      try { return localStorage.getItem(SESSION_KEY); } catch(e) { return null; }
+    }
 
     async function generateFingerprint() {
       const components = [];
@@ -277,9 +293,12 @@ export function getHomeHTML() {
     async function checkRemaining() {
       if (!browserFingerprint) return;
       try {
+        const headers = { 'Content-Type': 'application/json' };
+        const token = getSessionToken();
+        if (token) headers['X-Session-Token'] = token;
         const response = await fetch('/api/remaining', {
           method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
+          headers,
           body: JSON.stringify({ fingerprint: browserFingerprint })
         });
         const data = await response.json();
@@ -291,6 +310,7 @@ export function getHomeHTML() {
     }
 
     document.addEventListener('DOMContentLoaded', async () => {
+      handleSessionToken();
       browserFingerprint = await generateFingerprint();
       await checkRemaining();
     });
@@ -311,9 +331,12 @@ export function getHomeHTML() {
       btn.innerHTML = '<span class="loading"></span>';
       btn.disabled = true;
       try {
+        const headers = { 'Content-Type': 'application/json' };
+        const token = getSessionToken();
+        if (token) headers['X-Session-Token'] = token;
         const response = await fetch('/api/shorten', {
           method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
+          headers,
           body: JSON.stringify({
             url,
             customSlug: customSlug || undefined,
@@ -346,6 +369,14 @@ export function getHomeHTML() {
       navigator.clipboard.writeText(document.getElementById('shortUrl').textContent);
       showToast('Link copied to clipboard!');
     }
+
+    document.getElementById('adminLink').addEventListener('click', (e) => {
+      const token = getSessionToken();
+      if (token) {
+        e.preventDefault();
+        window.location.href = '/admin?_ts=' + token;
+      }
+    });
   </script>
 </body>
 </html>`;

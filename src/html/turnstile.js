@@ -87,6 +87,8 @@ export function getTurnstileHTML(siteKey) {
   </div>
 
   <script>
+    const SESSION_KEY = 'ts_session_token';
+    
     function onVerify(token) {
       const status = document.getElementById('status');
       const loading = document.getElementById('loading');
@@ -105,10 +107,20 @@ export function getTurnstileHTML(siteKey) {
       .then(data => {
         loading.style.display = 'none';
         if (data.success) {
+          if (data.sessionToken) {
+            try {
+              localStorage.setItem(SESSION_KEY, data.sessionToken);
+            } catch(e) {}
+          }
           status.textContent = 'Verified! Redirecting...';
           status.className = 'status success';
           setTimeout(() => {
-            window.location.href = data.redirect || '/';
+            let redirect = data.redirect || '/';
+            const savedToken = data.sessionToken;
+            if (savedToken) {
+              redirect += (redirect.includes('?') ? '&' : '?') + '_ts=' + savedToken;
+            }
+            window.location.href = redirect;
           }, 500);
         } else {
           status.textContent = data.error || 'Verification failed. Please try again.';

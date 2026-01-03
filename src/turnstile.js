@@ -3,6 +3,7 @@ import { getTurnstileHTML } from './html/turnstile.js';
 
 const SESSION_DURATION = 60 * 60;
 const SESSION_COOKIE_NAME = 'ts_session';
+const SESSION_HEADER_NAME = 'X-Session-Token';
 
 export function generateSessionId() {
   const array = new Uint8Array(32);
@@ -10,7 +11,14 @@ export function generateSessionId() {
   return Array.from(array, b => b.toString(16).padStart(2, '0')).join('');
 }
 
-export function getSessionFromCookie(request) {
+export function getSessionFromRequest(request) {
+  const headerSession = request.headers.get(SESSION_HEADER_NAME);
+  if (headerSession) return headerSession;
+  
+  const url = new URL(request.url);
+  const querySession = url.searchParams.get('_ts');
+  if (querySession) return querySession;
+  
   const cookie = request.headers.get('Cookie') || '';
   const match = cookie.match(new RegExp(`${SESSION_COOKIE_NAME}=([^;]+)`));
   return match ? match[1] : null;
@@ -18,6 +26,7 @@ export function getSessionFromCookie(request) {
 
 export async function isSessionValid(sessionId, env) {
   if (!sessionId) return false;
+  if (!/^[a-f0-9]{64}$/.test(sessionId)) return false;
   const session = await env.LINKS.get(`session:${sessionId}`);
   return session !== null;
 }
@@ -93,7 +102,7 @@ export async function handleTurnstileVerify(request, env) {
 
   if (outcome.success) {
     const sessionId = await createSession(env);
-    return new Response(JSON.stringify({ success: true, redirect: '/' }), {
+    return new Response(JSON.stringify({ success: true, redirect: '/', sessionToken: sessionId }), {
       headers: {
         ...corsHeaders,
         'Content-Type': 'application/json',
@@ -113,7 +122,7 @@ export async function requireTurnstile(request, env) {
     return null;
   }
 
-  const sessionId = getSessionFromCookie(request);
+  const sessionId = getSessionFromRequest(request);
   const valid = await isSessionValid(sessionId, env);
 
   if (!valid) {

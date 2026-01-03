@@ -173,7 +173,7 @@ export function getAdminHTML() {
 </head>
 <body>
   <div class="container">
-    <a href="/" class="back-link">&larr; Back to Home</a>
+    <a href="/" class="back-link" id="backLink">&larr; Back to Home</a>
     
     <header>
       <h1 class="logo">&lt;/shorted&gt;</h1>
@@ -218,6 +218,25 @@ export function getAdminHTML() {
   <div class="toast" id="toast"></div>
 
   <script>
+    const SESSION_KEY = 'ts_session_token';
+
+    function handleSessionToken() {
+      const params = new URLSearchParams(window.location.search);
+      const token = params.get('_ts');
+      if (token) {
+        try { localStorage.setItem(SESSION_KEY, token); } catch(e) {}
+        params.delete('_ts');
+        const newUrl = window.location.pathname + (params.toString() ? '?' + params.toString() : '');
+        window.history.replaceState({}, '', newUrl);
+      }
+    }
+
+    function getSessionToken() {
+      try { return localStorage.getItem(SESSION_KEY); } catch(e) { return null; }
+    }
+
+    handleSessionToken();
+
     function toggleApiKey() {
       const input = document.getElementById('apiKey');
       const btn = event.target;
@@ -247,7 +266,10 @@ export function getAdminHTML() {
       linksCard.style.display = 'block';
       container.innerHTML = '<div style="text-align: center; padding: 40px;"><span class="loading"></span></div>';
       try {
-        const response = await fetch('/api/links', { headers: { 'X-API-Key': getApiKey() } });
+        const headers = { 'X-API-Key': getApiKey() };
+        const token = getSessionToken();
+        if (token) headers['X-Session-Token'] = token;
+        const response = await fetch('/api/links', { headers });
         const data = await response.json();
         if (!response.ok) throw new Error(data.error || 'Failed to load links');
         const links = data.links;
@@ -291,7 +313,10 @@ export function getAdminHTML() {
     async function deleteLink(slug) {
       if (!confirm('Are you sure you want to delete this link?')) return;
       try {
-        const response = await fetch('/api/delete/' + slug, { method: 'DELETE', headers: { 'X-API-Key': getApiKey() } });
+        const headers = { 'X-API-Key': getApiKey() };
+        const token = getSessionToken();
+        if (token) headers['X-Session-Token'] = token;
+        const response = await fetch('/api/delete/' + slug, { method: 'DELETE', headers });
         const data = await response.json();
         if (!response.ok) throw new Error(data.error || 'Failed to delete link');
         showToast('Link deleted successfully');
@@ -305,6 +330,14 @@ export function getAdminHTML() {
       navigator.clipboard.writeText(window.location.origin + '/' + slug);
       showToast('Link copied to clipboard!');
     }
+
+    document.getElementById('backLink').addEventListener('click', (e) => {
+      const token = getSessionToken();
+      if (token) {
+        e.preventDefault();
+        window.location.href = '/?_ts=' + token;
+      }
+    });
   </script>
 </body>
 </html>`;
