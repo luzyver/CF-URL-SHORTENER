@@ -24,23 +24,26 @@ export default {
         return await handleTurnstileVerify(request, env);
       }
 
-      const isApiRoute = path.startsWith('/api/');
-      
-      if (!isApiRoute || path === '/api/shorten' || path === '/api/remaining') {
+      if (path === '/' || path === '/admin') {
         const turnstileResponse = await requireTurnstile(request, env);
         if (turnstileResponse) {
           return turnstileResponse;
         }
-      }
-
-      if (path === '/' || path === '/admin') {
         return new Response(getAdminHTML(), {
           headers: { 'Content-Type': 'text/html; charset=utf-8' },
         });
       }
 
       if (path === '/api/shorten' && request.method === 'POST') {
+        const turnstileResponse = await requireTurnstile(request, env);
+        if (turnstileResponse) {
+          return turnstileResponse;
+        }
         return await handleShorten(request, env);
+      }
+
+      if (path === '/api/remaining' && request.method === 'POST') {
+        return await handleCheckRemaining(request, env);
       }
 
       if (path === '/api/links' && request.method === 'GET') {
@@ -53,10 +56,6 @@ export default {
 
       if (path.startsWith('/api/stats/') && request.method === 'GET') {
         return await handleStats(request, env, path);
-      }
-
-      if (path === '/api/remaining' && request.method === 'POST') {
-        return await handleCheckRemaining(request, env);
       }
 
       const slug = path.slice(1);

@@ -283,7 +283,6 @@ export function getAdminHTML() {
   <div class="toast" id="toast"></div>
 
   <script>
-    const API_KEY_STORAGE = 'cf-url-shortener-api-key';
     let browserFingerprint = null;
 
     async function generateFingerprint() {
@@ -353,10 +352,6 @@ export function getAdminHTML() {
     document.addEventListener('DOMContentLoaded', async () => {
       browserFingerprint = await generateFingerprint();
       await checkRemaining();
-      const savedKey = localStorage.getItem(API_KEY_STORAGE);
-      if (savedKey) {
-        document.getElementById('apiKey').value = savedKey;
-      }
     });
 
     function toggleApiKey() {
@@ -372,9 +367,7 @@ export function getAdminHTML() {
     }
 
     function getApiKey() {
-      const key = document.getElementById('apiKey').value;
-      localStorage.setItem(API_KEY_STORAGE, key);
-      return key;
+      return document.getElementById('apiKey').value;
     }
 
     function showToast(message, isError = false) {
