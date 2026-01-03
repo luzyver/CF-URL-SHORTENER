@@ -3,16 +3,28 @@ import {
   generateSlug, 
   checkRateLimit, 
   getTodayKey,
+  getClientIP,
+  validateSlug,
+  validateUrl,
+  parseJsonBody,
   RATE_LIMIT_MAX,
   corsHeaders 
 } from './utils.js';
 import { get404HTML } from './html/404.js';
 
 export async function handleShorten(request, env) {
-  const body = await request.json();
-  const { url, customSlug, expiresIn, fingerprint } = body;
+  const parsed = await parseJsonBody(request);
+  if (parsed.error) {
+    return new Response(JSON.stringify({ error: parsed.error }), {
+      status: parsed.status,
+      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+    });
+  }
+  
+  const { url, customSlug, expiresIn, fingerprint } = parsed.data;
+  const clientIP = getClientIP(request);
 
-  const rateLimit = await checkRateLimit(fingerprint, env);
+  const rateLimit = await checkRateLimit(fingerprint, clientIP, env);
   if (!rateLimit.allowed) {
     return new Response(
       JSON.stringify({ 
@@ -26,17 +38,9 @@ export async function handleShorten(request, env) {
     );
   }
 
-  if (!url) {
-    return new Response(JSON.stringify({ error: 'URL is required' }), {
-      status: 400,
-      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-    });
-  }
-
-  try {
-    new URL(url);
-  } catch {
-    return new Response(JSON.stringify({ error: 'Invalid URL format' }), {
+  const urlValidation = validateUrl(url);
+  if (!urlValidation.valid) {
+    return new Response(JSON.stringify({ error: urlValidation.error }), {
       status: 400,
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
     });
@@ -45,6 +49,13 @@ export async function handleShorten(request, env) {
   let slug = customSlug || generateSlug();
 
   if (customSlug) {
+    if (!validateSlug(customSlug)) {
+      return new Response(JSON.stringify({ error: 'Invalid slug format. Use only letters, numbers, hyphens, and underscores.' }), {
+        status: 400,
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      });
+    }
+    
     const existing = await env.LINKS.get(slug);
     if (existing) {
       return new Response(JSON.stringify({ error: 'Slug already exists' }), {
@@ -119,7 +130,7 @@ export async function handleListLinks(request, env) {
   const links = [];
 
   for (const key of list.keys) {
-    if (key.name.startsWith('ratelimit:')) continue;
+    if (key.name.startsWith('ratelimit:') || key.name.startsWith('session:')) continue;
     
     const data = await env.LINKS.get(key.name);
     if (data) {
@@ -168,8 +179,15 @@ export async function handleDelete(request, env, path) {
 }
 
 export async function handleCheckRemaining(request, env) {
-  const body = await request.json();
-  const { fingerprint } = body;
+  const parsed = await parseJsonBody(request);
+  if (parsed.error) {
+    return new Response(JSON.stringify({ error: parsed.error }), {
+      status: parsed.status,
+      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+    });
+  }
+  
+  const { fingerprint } = parsed.data;
   
   if (!fingerprint) {
     return new Response(JSON.stringify({ error: 'Fingerprint required' }), {
@@ -179,7 +197,7 @@ export async function handleCheckRemaining(request, env) {
   }
   
   const today = getTodayKey();
-  const rateLimitKey = `ratelimit:${fingerprint}:${today}`;
+  const rateLimitKey = `ratelimit:fp:${fingerprint}:${today}`;
   
   const currentCount = await env.LINKS.get(rateLimitKey);
   const count = currentCount ? parseInt(currentCount) : 0;

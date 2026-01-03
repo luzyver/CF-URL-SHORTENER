@@ -1,5 +1,10 @@
 export const RATE_LIMIT_MAX = 5;
 export const RATE_LIMIT_WINDOW = 86400;
+export const MAX_PAYLOAD_SIZE = 10 * 1024;
+export const MAX_URL_LENGTH = 2048;
+export const MAX_SLUG_LENGTH = 50;
+export const SLUG_PATTERN = /^[a-zA-Z0-9_-]+$/;
+export const BLOCKED_PROTOCOLS = ['javascript:', 'data:', 'vbscript:', 'file:'];
 
 export function verifyApiKey(request, env) {
   const apiKey = request.headers.get('X-API-Key');
@@ -19,14 +24,82 @@ export function getTodayKey() {
   return new Date().toISOString().split('T')[0];
 }
 
-export async function checkRateLimit(fingerprint, env) {
+export function getClientIP(request) {
+  return request.headers.get('CF-Connecting-IP') || 
+         request.headers.get('X-Real-IP') || 
+         'unknown';
+}
+
+export function validateSlug(slug) {
+  if (!slug || typeof slug !== 'string') return false;
+  if (slug.length > MAX_SLUG_LENGTH) return false;
+  if (!SLUG_PATTERN.test(slug)) return false;
+  const reserved = ['api', 'admin', 'static', 'assets', 'favicon.ico'];
+  if (reserved.includes(slug.toLowerCase())) return false;
+  return true;
+}
+
+export function validateUrl(url) {
+  if (!url || typeof url !== 'string') return { valid: false, error: 'URL is required' };
+  if (url.length > MAX_URL_LENGTH) return { valid: false, error: 'URL too long' };
+  
+  try {
+    const parsed = new URL(url);
+    const protocol = parsed.protocol.toLowerCase();
+    
+    if (!['http:', 'https:'].includes(protocol)) {
+      return { valid: false, error: 'Only HTTP/HTTPS URLs allowed' };
+    }
+    
+    for (const blocked of BLOCKED_PROTOCOLS) {
+      if (url.toLowerCase().includes(blocked)) {
+        return { valid: false, error: 'Invalid URL' };
+      }
+    }
+    
+    return { valid: true };
+  } catch {
+    return { valid: false, error: 'Invalid URL format' };
+  }
+}
+
+export async function parseJsonBody(request) {
+  const contentLength = request.headers.get('Content-Length');
+  if (contentLength && parseInt(contentLength) > MAX_PAYLOAD_SIZE) {
+    return { error: 'Payload too large', status: 413 };
+  }
+  
+  try {
+    const text = await request.text();
+    if (text.length > MAX_PAYLOAD_SIZE) {
+      return { error: 'Payload too large', status: 413 };
+    }
+    return { data: JSON.parse(text) };
+  } catch {
+    return { error: 'Invalid JSON', status: 400 };
+  }
+}
+
+export async function checkRateLimit(fingerprint, ip, env) {
+  const today = getTodayKey();
+  
+  if (ip && ip !== 'unknown') {
+    const ipKey = `ratelimit:ip:${ip}:${today}`;
+    const ipCount = await env.LINKS.get(ipKey);
+    const ipUsage = ipCount ? parseInt(ipCount) : 0;
+    
+    if (ipUsage >= RATE_LIMIT_MAX * 3) {
+      return { allowed: false, remaining: 0, error: 'Too many requests from this network' };
+    }
+    
+    await env.LINKS.put(ipKey, (ipUsage + 1).toString(), { expirationTtl: RATE_LIMIT_WINDOW });
+  }
+  
   if (!fingerprint) {
     return { allowed: false, remaining: 0, error: 'Fingerprint required' };
   }
   
-  const today = getTodayKey();
-  const rateLimitKey = `ratelimit:${fingerprint}:${today}`;
-  
+  const rateLimitKey = `ratelimit:fp:${fingerprint}:${today}`;
   const currentCount = await env.LINKS.get(rateLimitKey);
   const count = currentCount ? parseInt(currentCount) : 0;
   

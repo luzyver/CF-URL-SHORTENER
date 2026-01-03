@@ -45,11 +45,27 @@ export async function handleTurnstilePage(env) {
 }
 
 export async function handleTurnstileVerify(request, env) {
-  const body = await request.json();
+  let body;
+  try {
+    const text = await request.text();
+    if (text.length > 10 * 1024) {
+      return new Response(JSON.stringify({ success: false, error: 'Payload too large' }), {
+        status: 413,
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+      });
+    }
+    body = JSON.parse(text);
+  } catch {
+    return new Response(JSON.stringify({ success: false, error: 'Invalid JSON' }), {
+      status: 400,
+      headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+    });
+  }
+  
   const { token } = body;
 
-  if (!token) {
-    return new Response(JSON.stringify({ success: false, error: 'Token required' }), {
+  if (!token || typeof token !== 'string' || token.length > 2048) {
+    return new Response(JSON.stringify({ success: false, error: 'Invalid token' }), {
       status: 400,
       headers: { ...corsHeaders, 'Content-Type': 'application/json' }
     });
