@@ -41,22 +41,6 @@ export function getHomeHTML() {
       text-align: center;
       border-bottom: 1px solid var(--border);
     }
-    .hero-badge {
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-      background: var(--primary-light);
-      color: var(--primary);
-      font-size: 0.8rem;
-      font-weight: 600;
-      padding: 6px 14px;
-      border-radius: 50px;
-      margin-bottom: 24px;
-    }
-    .hero-badge svg {
-      width: 14px;
-      height: 14px;
-    }
     .hero h1 {
       font-size: clamp(2rem, 5vw, 3rem);
       font-weight: 700;
@@ -284,12 +268,6 @@ export function getHomeHTML() {
 </head>
 <body>
   <section class="hero">
-    <div class="hero-badge">
-      <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
-        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
-      </svg>
-      Powered by Cloudflare Workers
-    </div>
     <h1>LZVR <span>Short</span></h1>
     <p>Simplify your links. Fast, free, and reliable URL shortener.</p>
   </section>
