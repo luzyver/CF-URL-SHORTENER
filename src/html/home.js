@@ -343,10 +343,18 @@ export function getHomeHTML() {
       const params = new URLSearchParams(window.location.search);
       const token = params.get('_ts');
       if (token) {
-        try { localStorage.setItem(SESSION_KEY, token); } catch(e) {}
-        params.delete('_ts');
-        const newUrl = window.location.pathname + (params.toString() ? '?' + params.toString() : '');
-        window.history.replaceState({}, '', newUrl);
+        let storedSuccessfully = false;
+        try { 
+          localStorage.setItem(SESSION_KEY, token);
+          if (localStorage.getItem(SESSION_KEY) === token) {
+            storedSuccessfully = true;
+          }
+        } catch(e) {}
+        if (storedSuccessfully) {
+          params.delete('_ts');
+          const newUrl = window.location.pathname + (params.toString() ? '?' + params.toString() : '');
+          window.history.replaceState({}, '', newUrl);
+        }
       }
     }
 

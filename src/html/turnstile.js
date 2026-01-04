@@ -138,18 +138,19 @@ export function getTurnstileHTML(siteKey) {
       .then(data => {
         loading.style.display = 'none';
         if (data.success) {
+          let tokenStored = false;
           if (data.sessionToken) {
             try {
               localStorage.setItem(SESSION_KEY, data.sessionToken);
+              tokenStored = localStorage.getItem(SESSION_KEY) === data.sessionToken;
             } catch(e) {}
           }
           status.textContent = 'Verified! Redirecting...';
           status.className = 'status success';
           setTimeout(() => {
             let redirect = data.redirect || '/';
-            const savedToken = data.sessionToken;
-            if (savedToken) {
-              redirect += (redirect.includes('?') ? '&' : '?') + '_ts=' + savedToken;
+            if (data.sessionToken) {
+              redirect += (redirect.includes('?') ? '&' : '?') + '_ts=' + data.sessionToken;
             }
             window.location.href = redirect;
           }, 500);

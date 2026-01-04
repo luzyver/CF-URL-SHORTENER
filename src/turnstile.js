@@ -40,7 +40,7 @@ export async function createSession(env) {
 }
 
 export function getSessionCookie(sessionId) {
-  return `${SESSION_COOKIE_NAME}=${sessionId}; Path=/; HttpOnly; Secure; SameSite=Lax; Max-Age=${SESSION_DURATION}`;
+  return `${SESSION_COOKIE_NAME}=${sessionId}; Path=/; Secure; SameSite=Lax; Max-Age=${SESSION_DURATION}`;
 }
 
 export async function handleTurnstilePage(env) {
