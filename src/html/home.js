@@ -363,55 +363,65 @@ export function getHomeHTML() {
     }
 
     async function generateFingerprint() {
-      const components = [];
-      components.push(screen.width + 'x' + screen.height);
-      components.push(screen.colorDepth);
-      components.push(window.devicePixelRatio || 1);
-      components.push(Intl.DateTimeFormat().resolvedOptions().timeZone);
-      components.push(navigator.language);
-      components.push(navigator.languages?.join(',') || '');
-      components.push(navigator.platform);
-      components.push(navigator.hardwareConcurrency || 0);
-      components.push(navigator.userAgent);
       try {
-        const canvas = document.createElement('canvas');
-        const ctx = canvas.getContext('2d');
-        canvas.width = 200;
-        canvas.height = 50;
-        ctx.textBaseline = 'top';
-        ctx.font = '14px Arial';
-        ctx.fillStyle = '#f60';
-        ctx.fillRect(0, 0, 100, 50);
-        ctx.fillStyle = '#069';
-        ctx.fillText('Fingerprint', 2, 15);
-        ctx.fillStyle = 'rgba(102, 204, 0, 0.7)';
-        ctx.fillText('Canvas', 4, 30);
-        components.push(canvas.toDataURL());
-      } catch (e) {
-        components.push('canvas-error');
-      }
-      try {
-        const canvas = document.createElement('canvas');
-        const gl = canvas.getContext('webgl') || canvas.getContext('experimental-webgl');
-        if (gl) {
-          const debugInfo = gl.getExtension('WEBGL_debug_renderer_info');
-          if (debugInfo) {
-            components.push(gl.getParameter(debugInfo.UNMASKED_VENDOR_WEBGL));
-            components.push(gl.getParameter(debugInfo.UNMASKED_RENDERER_WEBGL));
+        const components = [];
+        components.push(screen.width + 'x' + screen.height);
+        components.push(screen.colorDepth || 24);
+        components.push(window.devicePixelRatio || 1);
+        try { components.push(Intl.DateTimeFormat().resolvedOptions().timeZone); } catch(e) { components.push('tz-unknown'); }
+        components.push(navigator.language || 'en');
+        components.push(navigator.platform || 'unknown');
+        components.push(navigator.hardwareConcurrency || 0);
+        components.push(navigator.userAgent || 'unknown');
+        try {
+          const canvas = document.createElement('canvas');
+          const ctx = canvas.getContext('2d');
+          if (ctx) {
+            canvas.width = 200;
+            canvas.height = 50;
+            ctx.textBaseline = 'top';
+            ctx.font = '14px Arial';
+            ctx.fillStyle = '#f60';
+            ctx.fillRect(0, 0, 100, 50);
+            ctx.fillStyle = '#069';
+            ctx.fillText('Fingerprint', 2, 15);
+            components.push(canvas.toDataURL().slice(-50));
           }
+        } catch (e) {}
+        try {
+          const canvas = document.createElement('canvas');
+          const gl = canvas.getContext('webgl') || canvas.getContext('experimental-webgl');
+          if (gl) {
+            const debugInfo = gl.getExtension('WEBGL_debug_renderer_info');
+            if (debugInfo) {
+              components.push(gl.getParameter(debugInfo.UNMASKED_RENDERER_WEBGL) || 'gpu');
+            }
+          }
+        } catch (e) {}
+        const data = components.join('|');
+        if (crypto && crypto.subtle) {
+          const encoder = new TextEncoder();
+          const hashBuffer = await crypto.subtle.digest('SHA-256', encoder.encode(data));
+          const hashArray = Array.from(new Uint8Array(hashBuffer));
+          return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
         }
+        let hash = 0;
+        for (let i = 0; i < data.length; i++) {
+          const char = data.charCodeAt(i);
+          hash = ((hash << 5) - hash) + char;
+          hash = hash & hash;
+        }
+        return Math.abs(hash).toString(16).padStart(16, '0') + Date.now().toString(16);
       } catch (e) {
-        components.push('webgl-error');
+        return 'fallback-' + Date.now().toString(16) + '-' + Math.random().toString(16).slice(2);
       }
-      const data = components.join('|||');
-      const encoder = new TextEncoder();
-      const hashBuffer = await crypto.subtle.digest('SHA-256', encoder.encode(data));
-      const hashArray = Array.from(new Uint8Array(hashBuffer));
-      return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
     }
 
     async function checkRemaining() {
-      if (!browserFingerprint) return;
+      if (!browserFingerprint) {
+        document.getElementById('remainingInfo').innerHTML = 'Free to use — up to <strong>5 links</strong> per day';
+        return;
+      }
       try {
         const headers = { 'Content-Type': 'application/json' };
         const token = getSessionToken();
@@ -421,12 +431,14 @@ export function getHomeHTML() {
           headers,
           body: JSON.stringify({ fingerprint: browserFingerprint })
         });
-        const data = await response.json();
         if (response.ok) {
+          const data = await response.json();
           document.getElementById('remainingInfo').innerHTML = 
             'You have <strong>' + data.remaining + '</strong> of ' + data.limit + ' links remaining today';
         }
-      } catch (e) {}
+      } catch (e) {
+        document.getElementById('remainingInfo').innerHTML = 'Free to use — up to <strong>5 links</strong> per day';
+      }
     }
 
     document.addEventListener('DOMContentLoaded', async () => {
