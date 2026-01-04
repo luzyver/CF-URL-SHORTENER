@@ -354,6 +354,19 @@ export function getHomeHTML() {
     }
 
     async function generateFingerprint() {
+      const FP_KEY = 'lzvr_fp';
+      function getStored() {
+        try { const v = localStorage.getItem(FP_KEY); if (v && v.length >= 16) return v; } catch(e) {}
+        try { const v = sessionStorage.getItem(FP_KEY); if (v && v.length >= 16) return v; } catch(e) {}
+        return null;
+      }
+      function saveFingerprint(fp) {
+        try { localStorage.setItem(FP_KEY, fp); } catch(e) {}
+        try { sessionStorage.setItem(FP_KEY, fp); } catch(e) {}
+      }
+      const stored = getStored();
+      if (stored) return stored;
+      let fingerprint;
       try {
         const components = [];
         components.push(screen.width + 'x' + screen.height);
@@ -394,18 +407,21 @@ export function getHomeHTML() {
           const encoder = new TextEncoder();
           const hashBuffer = await crypto.subtle.digest('SHA-256', encoder.encode(data));
           const hashArray = Array.from(new Uint8Array(hashBuffer));
-          return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+          fingerprint = hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+        } else {
+          let hash = 0;
+          for (let i = 0; i < data.length; i++) {
+            const char = data.charCodeAt(i);
+            hash = ((hash << 5) - hash) + char;
+            hash = hash & hash;
+          }
+          fingerprint = Math.abs(hash).toString(16).padStart(32, '0');
         }
-        let hash = 0;
-        for (let i = 0; i < data.length; i++) {
-          const char = data.charCodeAt(i);
-          hash = ((hash << 5) - hash) + char;
-          hash = hash & hash;
-        }
-        return Math.abs(hash).toString(16).padStart(16, '0') + Date.now().toString(16);
       } catch (e) {
-        return 'fallback-' + Date.now().toString(16) + '-' + Math.random().toString(16).slice(2);
+        fingerprint = 'fp-' + Math.random().toString(36).slice(2) + Math.random().toString(36).slice(2);
       }
+      saveFingerprint(fingerprint);
+      return fingerprint;
     }
 
     async function checkRemaining() {
