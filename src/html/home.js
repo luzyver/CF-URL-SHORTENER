@@ -4,196 +4,319 @@ export function getHomeHTML() {
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>CF-URL-Shortener</title>
+  <title>LZVR Short — Simplify Your Links</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
   <style>
     :root {
-      --bg-primary: #0a0a0f;
-      --bg-secondary: #12121a;
-      --bg-tertiary: #1a1a25;
-      --accent: #00ff88;
-      --accent-dim: #00ff8833;
-      --accent-secondary: #00d4ff;
-      --text-primary: #ffffff;
-      --text-secondary: #8888aa;
-      --text-muted: #555566;
-      --border: #2a2a3a;
-      --danger: #ff4466;
-      --danger-dim: #ff446633;
+      --bg-body: #F4F7F9;
+      --bg-surface: #FFFFFF;
+      --primary: #3B82F6;
+      --primary-hover: #2563EB;
+      --primary-light: #EFF6FF;
+      --text-main: #1E293B;
+      --text-secondary: #64748B;
+      --text-muted: #94A3B8;
+      --border: #E2E8F0;
+      --input-bg: #F8FAFC;
+      --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
+      --shadow-lg: 0 10px 25px -5px rgba(0, 0, 0, 0.08), 0 8px 10px -6px rgba(0, 0, 0, 0.03);
+      --success: #10B981;
+      --success-light: #D1FAE5;
+      --danger: #EF4444;
+      --danger-light: #FEE2E2;
     }
     * { margin: 0; padding: 0; box-sizing: border-box; }
     body {
-      font-family: 'Outfit', sans-serif;
-      background: var(--bg-primary);
-      color: var(--text-primary);
+      font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+      background: var(--bg-body);
+      color: var(--text-main);
       min-height: 100vh;
-      background-image: 
-        radial-gradient(ellipse at 20% 20%, var(--accent-dim) 0%, transparent 50%),
-        radial-gradient(ellipse at 80% 80%, rgba(0, 212, 255, 0.1) 0%, transparent 50%);
+      line-height: 1.6;
     }
-    .container { max-width: 700px; margin: 0 auto; padding: 40px 20px; }
-    header { text-align: center; margin-bottom: 50px; }
-    .logo {
-      font-family: 'JetBrains Mono', monospace;
-      font-size: 2.5rem;
+    .hero {
+      background: linear-gradient(135deg, #FFFFFF 0%, #F0F7FF 100%);
+      padding: 80px 24px 60px;
+      text-align: center;
+      border-bottom: 1px solid var(--border);
+    }
+    .hero-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: var(--primary-light);
+      color: var(--primary);
+      font-size: 0.8rem;
+      font-weight: 600;
+      padding: 6px 14px;
+      border-radius: 50px;
+      margin-bottom: 24px;
+    }
+    .hero-badge svg {
+      width: 14px;
+      height: 14px;
+    }
+    .hero h1 {
+      font-size: clamp(2rem, 5vw, 3rem);
       font-weight: 700;
-      background: linear-gradient(135deg, var(--accent), var(--accent-secondary));
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      background-clip: text;
-      margin-bottom: 10px;
-      letter-spacing: -2px;
+      color: var(--text-main);
+      margin-bottom: 16px;
+      letter-spacing: -0.025em;
     }
-    .tagline { color: var(--text-secondary); font-size: 1.1rem; font-weight: 300; }
+    .hero h1 span {
+      color: var(--primary);
+    }
+    .hero p {
+      font-size: 1.125rem;
+      color: var(--text-secondary);
+      max-width: 500px;
+      margin: 0 auto;
+      font-weight: 400;
+    }
+    .main-content {
+      max-width: 680px;
+      margin: 0 auto;
+      padding: 0 24px;
+      transform: translateY(-40px);
+    }
     .card {
-      background: var(--bg-secondary);
-      border: 1px solid var(--border);
+      background: var(--bg-surface);
       border-radius: 16px;
-      padding: 30px;
-      margin-bottom: 30px;
+      padding: 40px;
+      box-shadow: var(--shadow-lg);
+      border: 1px solid var(--border);
+    }
+    .card-header {
+      margin-bottom: 28px;
     }
     .card-title {
-      font-family: 'JetBrains Mono', monospace;
-      font-size: 0.85rem;
-      color: var(--accent);
-      text-transform: uppercase;
-      letter-spacing: 2px;
+      font-size: 1.25rem;
+      font-weight: 600;
+      color: var(--text-main);
+      margin-bottom: 6px;
+    }
+    .card-description {
+      font-size: 0.9rem;
+      color: var(--text-secondary);
+    }
+    .card-description strong {
+      color: var(--primary);
+      font-weight: 600;
+    }
+    .form-group {
       margin-bottom: 20px;
-      display: flex;
-      align-items: center;
-      gap: 10px;
     }
-    .card-title::before {
-      content: '';
-      width: 8px;
-      height: 8px;
-      background: var(--accent);
-      border-radius: 50%;
-      box-shadow: 0 0 10px var(--accent);
+    label {
+      display: block;
+      font-size: 0.875rem;
+      font-weight: 500;
+      color: var(--text-main);
+      margin-bottom: 8px;
     }
-    .form-group { margin-bottom: 20px; }
-    label { display: block; font-size: 0.9rem; color: var(--text-secondary); margin-bottom: 8px; font-weight: 500; }
     input, select {
       width: 100%;
-      padding: 14px 18px;
-      background: var(--bg-tertiary);
+      padding: 14px 16px;
+      background: var(--input-bg);
       border: 1px solid var(--border);
       border-radius: 10px;
-      color: var(--text-primary);
+      color: var(--text-main);
       font-family: 'JetBrains Mono', monospace;
-      font-size: 0.95rem;
-      transition: all 0.3s ease;
+      font-size: 0.9rem;
+      transition: all 0.2s ease;
     }
     input:focus, select:focus {
       outline: none;
-      border-color: var(--accent);
-      box-shadow: 0 0 0 3px var(--accent-dim);
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.15);
+      background: var(--bg-surface);
     }
-    input::placeholder { color: var(--text-muted); }
-    .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
-    @media (max-width: 600px) { .form-row { grid-template-columns: 1fr; } }
+    input::placeholder {
+      color: var(--text-muted);
+      font-family: 'JetBrains Mono', monospace;
+    }
+    select {
+      cursor: pointer;
+      font-family: 'Plus Jakarta Sans', sans-serif;
+    }
+    .form-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+    }
+    @media (max-width: 600px) {
+      .form-row { grid-template-columns: 1fr; }
+      .card { padding: 28px 20px; }
+      .hero { padding: 60px 20px 50px; }
+    }
     .btn {
       padding: 14px 28px;
       border: none;
       border-radius: 10px;
-      font-family: 'Outfit', sans-serif;
+      font-family: 'Plus Jakarta Sans', sans-serif;
       font-size: 1rem;
       font-weight: 600;
       cursor: pointer;
-      transition: all 0.3s ease;
+      transition: all 0.2s ease;
       display: inline-flex;
       align-items: center;
+      justify-content: center;
       gap: 8px;
     }
     .btn-primary {
-      background: linear-gradient(135deg, var(--accent), #00cc66);
-      color: var(--bg-primary);
+      background: var(--primary);
+      color: white;
       width: 100%;
-      justify-content: center;
+      box-shadow: 0 1px 3px rgba(59, 130, 246, 0.3);
     }
-    .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 10px 30px var(--accent-dim); }
-    .btn-copy { background: var(--bg-tertiary); color: var(--text-secondary); padding: 8px 14px; font-size: 0.85rem; }
-    .btn-copy:hover { background: var(--accent-dim); color: var(--accent); }
+    .btn-primary:hover {
+      background: var(--primary-hover);
+      box-shadow: 0 4px 12px rgba(59, 130, 246, 0.35);
+      transform: translateY(-1px);
+    }
+    .btn-primary:active {
+      transform: translateY(0);
+    }
+    .btn-copy {
+      background: var(--primary-light);
+      color: var(--primary);
+      padding: 10px 18px;
+      font-size: 0.875rem;
+    }
+    .btn-copy:hover {
+      background: var(--primary);
+      color: white;
+    }
     .result {
       display: none;
-      background: var(--bg-tertiary);
-      border: 1px solid var(--accent);
+      background: var(--success-light);
+      border: 1px solid #A7F3D0;
       border-radius: 10px;
       padding: 20px;
-      margin-top: 20px;
+      margin-top: 24px;
     }
-    .result.show { display: block; animation: slideIn 0.3s ease; }
-    @keyframes slideIn { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
+    .result.show {
+      display: block;
+      animation: fadeIn 0.3s ease;
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(-8px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    .result-label {
+      font-size: 0.75rem;
+      font-weight: 600;
+      color: #059669;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-bottom: 8px;
+    }
     .result-url {
-      font-family: 'JetBrains Mono', monospace;
-      font-size: 1.1rem;
-      color: var(--accent);
-      word-break: break-all;
       display: flex;
       align-items: center;
       justify-content: space-between;
-      gap: 15px;
+      gap: 12px;
+    }
+    .result-url span {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 1rem;
+      color: #047857;
+      word-break: break-all;
+      font-weight: 500;
     }
     .toast {
       position: fixed;
-      bottom: 30px;
-      right: 30px;
-      padding: 16px 24px;
-      background: var(--bg-secondary);
-      border: 1px solid var(--accent);
+      bottom: 24px;
+      right: 24px;
+      padding: 14px 20px;
+      background: var(--bg-surface);
+      border: 1px solid var(--border);
       border-radius: 10px;
-      color: var(--accent);
-      font-family: 'JetBrains Mono', monospace;
+      color: var(--text-main);
       font-size: 0.9rem;
-      transform: translateX(150%);
+      font-weight: 500;
+      box-shadow: var(--shadow-lg);
+      transform: translateX(120%);
       transition: transform 0.3s ease;
       z-index: 1000;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .toast::before {
+      content: '';
+      width: 8px;
+      height: 8px;
+      background: var(--success);
+      border-radius: 50%;
     }
     .toast.show { transform: translateX(0); }
-    .toast.error { border-color: var(--danger); color: var(--danger); }
+    .toast.error { border-color: var(--danger); }
+    .toast.error::before { background: var(--danger);     }
     .loading {
       display: inline-block;
       width: 20px;
       height: 20px;
-      border: 2px solid var(--text-muted);
-      border-top-color: var(--accent);
+      border: 2px solid rgba(255, 255, 255, 0.3);
+      border-top-color: white;
       border-radius: 50%;
-      animation: spin 0.8s linear infinite;
+      animation: spin 0.7s linear infinite;
     }
     @keyframes spin { to { transform: rotate(360deg); } }
-    .footer { text-align: center; margin-top: 30px; color: var(--text-muted); font-size: 0.85rem; }
-    .footer a { color: var(--accent); text-decoration: none; }
-    .footer a:hover { text-decoration: underline; }
+    .footer {
+      text-align: center;
+      padding: 40px 24px 60px;
+    }
+    .footer a {
+      color: var(--text-secondary);
+      text-decoration: none;
+      font-size: 0.9rem;
+      font-weight: 500;
+      padding: 10px 20px;
+      border-radius: 8px;
+      transition: all 0.2s;
+    }
+    .footer a:hover {
+      color: var(--primary);
+      background: var(--primary-light);
+    }
   </style>
 </head>
 <body>
-  <div class="container">
-    <header>
-      <h1 class="logo">&lt;/shorted&gt;</h1>
-      <p class="tagline">Lightning-fast URL shortener powered by Cloudflare Workers</p>
-    </header>
+  <section class="hero">
+    <div class="hero-badge">
+      <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
+      </svg>
+      Powered by Cloudflare Workers
+    </div>
+    <h1>LZVR <span>Short</span></h1>
+    <p>Simplify your links. Fast, free, and reliable URL shortener.</p>
+  </section>
 
+  <main class="main-content">
     <div class="card">
-      <div class="card-title">Create Short Link</div>
-      <p id="remainingInfo" style="color: var(--text-secondary); margin-bottom: 20px; font-size: 0.9rem;">
-        Free to use! Max <strong style="color: var(--accent);">5 links per day</strong>
-      </p>
+      <div class="card-header">
+        <h2 class="card-title">Shorten Your Link</h2>
+        <p class="card-description" id="remainingInfo">
+          Free to use — up to <strong>5 links per day</strong>
+        </p>
+      </div>
+      
       <form id="shortenForm">
         <div class="form-group">
-          <label>Destination URL</label>
+          <label for="url">Destination URL</label>
           <input type="url" id="url" placeholder="https://example.com/your-long-url" required />
         </div>
         <div class="form-row">
           <div class="form-group">
-            <label>Custom Slug (optional)</label>
-            <input type="text" id="customSlug" placeholder="my-custom-link" pattern="[a-zA-Z0-9-_]+" />
+            <label for="customSlug">Custom Slug (optional)</label>
+            <input type="text" id="customSlug" placeholder="my-link" pattern="[a-zA-Z0-9-_]+" />
           </div>
           <div class="form-group">
-            <label>Expires In</label>
+            <label for="expiresIn">Expiration</label>
             <select id="expiresIn">
-              <option value="">Never</option>
+              <option value="">Never expires</option>
               <option value="3600">1 Hour</option>
               <option value="86400">1 Day</option>
               <option value="604800">1 Week</option>
@@ -202,24 +325,26 @@ export function getHomeHTML() {
           </div>
         </div>
         <button type="submit" class="btn btn-primary">
-          <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <svg width="18" height="18" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1"></path>
           </svg>
           Shorten URL
         </button>
       </form>
+      
       <div class="result" id="result">
+        <div class="result-label">Your short link is ready</div>
         <div class="result-url">
           <span id="shortUrl"></span>
           <button class="btn btn-copy" onclick="copyUrl()">Copy</button>
         </div>
       </div>
     </div>
+  </main>
 
-    <div class="footer">
-      <a href="/admin" id="adminLink">Admin Panel</a>
-    </div>
-  </div>
+  <footer class="footer">
+    <a href="/admin" id="adminLink">Admin Panel →</a>
+  </footer>
 
   <div class="toast" id="toast"></div>
 
@@ -304,7 +429,7 @@ export function getHomeHTML() {
         const data = await response.json();
         if (response.ok) {
           document.getElementById('remainingInfo').innerHTML = 
-            'You have <strong style="color: var(--accent);">' + data.remaining + '</strong> of ' + data.limit + ' links remaining today';
+            'You have <strong>' + data.remaining + '</strong> of ' + data.limit + ' links remaining today';
         }
       } catch (e) {}
     }
@@ -352,7 +477,7 @@ export function getHomeHTML() {
         showToast('Short link created!' + remainingMsg);
         if (data.remaining !== undefined) {
           document.getElementById('remainingInfo').innerHTML = 
-            'You have <strong style="color: var(--accent);">' + data.remaining + '</strong> of 5 links remaining today';
+            'You have <strong>' + data.remaining + '</strong> of 5 links remaining today';
         }
         document.getElementById('url').value = '';
         document.getElementById('customSlug').value = '';
@@ -360,7 +485,7 @@ export function getHomeHTML() {
       } catch (error) {
         showToast(error.message, true);
       } finally {
-        btn.innerHTML = '<svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1"></path></svg> Shorten URL';
+        btn.innerHTML = '<svg width="18" height="18" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1"></path></svg> Shorten URL';
         btn.disabled = false;
       }
     });
@@ -381,4 +506,3 @@ export function getHomeHTML() {
 </body>
 </html>`;
 }
-
