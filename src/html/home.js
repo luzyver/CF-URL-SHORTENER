@@ -19,34 +19,44 @@ export function getHomeHTML() {
       --text-secondary: #64748B;
       --text-muted: #94A3B8;
       --border: #E2E8F0;
-      --input-bg: #F8FAFC;
+      --input-bg: #FFFFFF;
       --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
       --shadow-lg: 0 10px 25px -5px rgba(0, 0, 0, 0.08), 0 8px 10px -6px rgba(0, 0, 0, 0.03);
       --success: #10B981;
-      --success-light: #D1FAE5;
+      --success-light: #ECFDF5;
       --danger: #EF4444;
-      --danger-light: #FEE2E2;
     }
     * { margin: 0; padding: 0; box-sizing: border-box; }
+    html { height: 100%; }
     body {
       font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
-      background: var(--bg-body);
+      background: linear-gradient(180deg, #FFFFFF 0%, #F4F7F9 50%, #EEF2F6 100%);
       color: var(--text-main);
-      min-height: 100vh;
+      min-height: 100%;
+      display: flex;
+      flex-direction: column;
       line-height: 1.6;
     }
+    main {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      padding: 60px 24px 40px;
+      max-width: 600px;
+      margin: 0 auto;
+      width: 100%;
+    }
     .hero {
-      background: linear-gradient(135deg, #FFFFFF 0%, #F0F7FF 100%);
-      padding: 80px 24px 60px;
       text-align: center;
-      border-bottom: 1px solid var(--border);
+      margin-bottom: 48px;
     }
     .hero h1 {
-      font-size: clamp(2rem, 5vw, 3rem);
+      font-size: clamp(2.5rem, 6vw, 3.5rem);
       font-weight: 700;
       color: var(--text-main);
-      margin-bottom: 16px;
-      letter-spacing: -0.025em;
+      margin-bottom: 12px;
+      letter-spacing: -0.03em;
     }
     .hero h1 span {
       color: var(--primary);
@@ -54,66 +64,39 @@ export function getHomeHTML() {
     .hero p {
       font-size: 1.125rem;
       color: var(--text-secondary);
-      max-width: 500px;
-      margin: 0 auto;
       font-weight: 400;
     }
-    .main-content {
-      max-width: 680px;
-      margin: 0 auto;
-      padding: 0 24px;
-      transform: translateY(-40px);
-    }
-    .card {
-      background: var(--bg-surface);
-      border-radius: 16px;
-      padding: 40px;
-      box-shadow: var(--shadow-lg);
-      border: 1px solid var(--border);
-    }
-    .card-header {
-      margin-bottom: 28px;
-    }
-    .card-title {
-      font-size: 1.25rem;
-      font-weight: 600;
-      color: var(--text-main);
-      margin-bottom: 6px;
-    }
-    .card-description {
-      font-size: 0.9rem;
-      color: var(--text-secondary);
-    }
-    .card-description strong {
-      color: var(--primary);
-      font-weight: 600;
+    .form-section {
+      margin-bottom: 32px;
     }
     .form-group {
-      margin-bottom: 20px;
+      margin-bottom: 16px;
     }
-    label {
+    .form-group label {
       display: block;
-      font-size: 0.875rem;
-      font-weight: 500;
-      color: var(--text-main);
+      font-size: 0.8rem;
+      font-weight: 600;
+      color: var(--text-muted);
       margin-bottom: 8px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
     }
     input, select {
       width: 100%;
-      padding: 14px 16px;
+      padding: 16px 20px;
       background: var(--input-bg);
       border: 1px solid var(--border);
-      border-radius: 10px;
+      border-radius: 12px;
       color: var(--text-main);
       font-family: 'JetBrains Mono', monospace;
-      font-size: 0.9rem;
+      font-size: 0.95rem;
       transition: all 0.2s ease;
+      box-shadow: var(--shadow);
     }
     input:focus, select:focus {
       outline: none;
       border-color: var(--primary);
-      box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.15);
-      background: var(--bg-surface);
+      box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.12);
     }
     input::placeholder {
       color: var(--text-muted);
@@ -126,17 +109,12 @@ export function getHomeHTML() {
     .form-row {
       display: grid;
       grid-template-columns: 1fr 1fr;
-      gap: 16px;
-    }
-    @media (max-width: 600px) {
-      .form-row { grid-template-columns: 1fr; }
-      .card { padding: 28px 20px; }
-      .hero { padding: 60px 20px 50px; }
+      gap: 12px;
     }
     .btn {
-      padding: 14px 28px;
+      padding: 16px 32px;
       border: none;
-      border-radius: 10px;
+      border-radius: 12px;
       font-family: 'Plus Jakarta Sans', sans-serif;
       font-size: 1rem;
       font-weight: 600;
@@ -145,38 +123,38 @@ export function getHomeHTML() {
       display: inline-flex;
       align-items: center;
       justify-content: center;
-      gap: 8px;
+      gap: 10px;
     }
     .btn-primary {
       background: var(--primary);
       color: white;
       width: 100%;
-      box-shadow: 0 1px 3px rgba(59, 130, 246, 0.3);
+      box-shadow: 0 2px 8px rgba(59, 130, 246, 0.35);
     }
     .btn-primary:hover {
       background: var(--primary-hover);
-      box-shadow: 0 4px 12px rgba(59, 130, 246, 0.35);
-      transform: translateY(-1px);
+      box-shadow: 0 4px 16px rgba(59, 130, 246, 0.4);
+      transform: translateY(-2px);
     }
     .btn-primary:active {
       transform: translateY(0);
     }
     .btn-copy {
-      background: var(--primary-light);
-      color: var(--primary);
-      padding: 10px 18px;
-      font-size: 0.875rem;
-    }
-    .btn-copy:hover {
       background: var(--primary);
       color: white;
+      padding: 10px 20px;
+      font-size: 0.875rem;
+      box-shadow: none;
+    }
+    .btn-copy:hover {
+      background: var(--primary-hover);
     }
     .result {
       display: none;
       background: var(--success-light);
       border: 1px solid #A7F3D0;
-      border-radius: 10px;
-      padding: 20px;
+      border-radius: 12px;
+      padding: 20px 24px;
       margin-top: 24px;
     }
     .result.show {
@@ -187,26 +165,49 @@ export function getHomeHTML() {
       from { opacity: 0; transform: translateY(-8px); }
       to { opacity: 1; transform: translateY(0); }
     }
-    .result-label {
-      font-size: 0.75rem;
+    .result-header {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 12px;
+    }
+    .result-header svg {
+      width: 18px;
+      height: 18px;
+      color: #059669;
+    }
+    .result-header span {
+      font-size: 0.8rem;
       font-weight: 600;
       color: #059669;
       text-transform: uppercase;
       letter-spacing: 0.5px;
-      margin-bottom: 8px;
     }
     .result-url {
       display: flex;
       align-items: center;
       justify-content: space-between;
       gap: 12px;
+      background: white;
+      border-radius: 8px;
+      padding: 12px 16px;
     }
     .result-url span {
       font-family: 'JetBrains Mono', monospace;
-      font-size: 1rem;
+      font-size: 0.95rem;
       color: #047857;
       word-break: break-all;
       font-weight: 500;
+    }
+    .info-text {
+      text-align: center;
+      font-size: 0.85rem;
+      color: var(--text-muted);
+      margin-top: 20px;
+    }
+    .info-text strong {
+      color: var(--text-secondary);
+      font-weight: 600;
     }
     .toast {
       position: fixed;
@@ -215,7 +216,7 @@ export function getHomeHTML() {
       padding: 14px 20px;
       background: var(--bg-surface);
       border: 1px solid var(--border);
-      border-radius: 10px;
+      border-radius: 12px;
       color: var(--text-main);
       font-size: 0.9rem;
       font-weight: 500;
@@ -236,7 +237,7 @@ export function getHomeHTML() {
     }
     .toast.show { transform: translateX(0); }
     .toast.error { border-color: var(--danger); }
-    .toast.error::before { background: var(--danger);     }
+    .toast.error::before { background: var(--danger); }
     .loading {
       display: inline-block;
       width: 20px;
@@ -247,52 +248,49 @@ export function getHomeHTML() {
       animation: spin 0.7s linear infinite;
     }
     @keyframes spin { to { transform: rotate(360deg); } }
-    .footer {
+    footer {
+      padding: 32px 24px;
       text-align: center;
-      padding: 40px 24px 60px;
+      border-top: 1px solid var(--border);
+      background: var(--bg-surface);
     }
-    .footer a {
-      color: var(--text-secondary);
-      text-decoration: none;
-      font-size: 0.9rem;
-      font-weight: 500;
-      padding: 10px 20px;
-      border-radius: 8px;
-      transition: all 0.2s;
+    .footer-content {
+      max-width: 600px;
+      margin: 0 auto;
     }
-    .footer a:hover {
-      color: var(--primary);
-      background: var(--primary-light);
+    .footer-text {
+      font-size: 0.85rem;
+      color: var(--text-muted);
+    }
+    @media (max-width: 600px) {
+      main { padding: 40px 20px 32px; }
+      .form-row { grid-template-columns: 1fr; }
+      .hero h1 { font-size: 2rem; }
+      .hero { margin-bottom: 36px; }
+      input, select { padding: 14px 16px; }
     }
   </style>
 </head>
 <body>
-  <section class="hero">
-    <h1>LZVR <span>Short</span></h1>
-    <p>Simplify your links. Fast, free, and reliable URL shortener.</p>
-  </section>
+  <main>
+    <div class="hero">
+      <h1>LZVR <span>Short</span></h1>
+      <p>Simplify your links. Fast, free, and reliable.</p>
+    </div>
 
-  <main class="main-content">
-    <div class="card">
-      <div class="card-header">
-        <h2 class="card-title">Shorten Your Link</h2>
-        <p class="card-description" id="remainingInfo">
-          Free to use — up to <strong>5 links per day</strong>
-        </p>
-      </div>
-      
+    <div class="form-section">
       <form id="shortenForm">
         <div class="form-group">
-          <label for="url">Destination URL</label>
-          <input type="url" id="url" placeholder="https://example.com/your-long-url" required />
+          <label for="url">Paste your long URL</label>
+          <input type="url" id="url" placeholder="https://example.com/your-very-long-url-here" required />
         </div>
         <div class="form-row">
           <div class="form-group">
-            <label for="customSlug">Custom Slug (optional)</label>
+            <label for="customSlug">Custom alias (optional)</label>
             <input type="text" id="customSlug" placeholder="my-link" pattern="[a-zA-Z0-9-_]+" />
           </div>
           <div class="form-group">
-            <label for="expiresIn">Expiration</label>
+            <label for="expiresIn">Link expiration</label>
             <select id="expiresIn">
               <option value="">Never expires</option>
               <option value="3600">1 Hour</option>
@@ -311,17 +309,28 @@ export function getHomeHTML() {
       </form>
       
       <div class="result" id="result">
-        <div class="result-label">Your short link is ready</div>
+        <div class="result-header">
+          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+          </svg>
+          <span>Your short link is ready</span>
+        </div>
         <div class="result-url">
           <span id="shortUrl"></span>
           <button class="btn btn-copy" onclick="copyUrl()">Copy</button>
         </div>
       </div>
+
+      <p class="info-text" id="remainingInfo">
+        Free to use — up to <strong>5 links</strong> per day
+      </p>
     </div>
   </main>
 
-  <footer class="footer">
-    <a href="/admin" id="adminLink">Admin Panel →</a>
+  <footer>
+    <div class="footer-content">
+      <p class="footer-text">© 2025 LZVR Short. All rights reserved.</p>
+    </div>
   </footer>
 
   <div class="toast" id="toast"></div>
@@ -472,14 +481,6 @@ export function getHomeHTML() {
       navigator.clipboard.writeText(document.getElementById('shortUrl').textContent);
       showToast('Link copied to clipboard!');
     }
-
-    document.getElementById('adminLink').addEventListener('click', (e) => {
-      const token = getSessionToken();
-      if (token) {
-        e.preventDefault();
-        window.location.href = '/admin?_ts=' + token;
-      }
-    });
   </script>
 </body>
 </html>`;
