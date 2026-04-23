@@ -1,4 +1,4 @@
-export function getTurnstileHTML(siteKey) {
+export function getTurnstileHTML(siteKey, redirectPath = '/') {
   return `<!DOCTYPE html>
 <html lang="en">
 <head>
@@ -127,6 +127,7 @@ export function getTurnstileHTML(siteKey) {
 
   <script>
     const SESSION_KEY = 'ts_session_token';
+    const REDIRECT_PATH = ${JSON.stringify(redirectPath)};
 
     function onVerify(token) {
       const status = document.getElementById('status');
@@ -136,7 +137,7 @@ export function getTurnstileHTML(siteKey) {
       fetch('/api/turnstile/verify', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ token }),
+        body: JSON.stringify({ token, redirect: REDIRECT_PATH }),
         credentials: 'same-origin'
       })
       .then(res => res.json())

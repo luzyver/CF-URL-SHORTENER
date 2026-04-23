@@ -1,6 +1,14 @@
 import { corsHeaders } from './utils.js';
 import { getTurnstileHTML } from './html/turnstile.js';
 
+function sanitizeRedirect(redirect) {
+  if (!redirect || typeof redirect !== 'string') return '/';
+  if (!redirect.startsWith('/') || redirect.startsWith('//')) return '/';
+  if (/[\r\n\0]/.test(redirect)) return '/';
+  if (redirect.length > 200) return '/';
+  return redirect;
+}
+
 const SESSION_DURATION = 60 * 60;
 const SESSION_COOKIE_NAME = 'ts_session';
 const SESSION_HEADER_NAME = 'X-Session-Token';
@@ -43,12 +51,12 @@ export function getSessionCookie(sessionId) {
   return `${SESSION_COOKIE_NAME}=${sessionId}; Path=/; Secure; SameSite=Lax; Max-Age=${SESSION_DURATION}`;
 }
 
-export async function handleTurnstilePage(env) {
+export async function handleTurnstilePage(env, redirectPath = '/') {
   const siteKey = env.TURNSTILE_SITE_KEY;
   if (!siteKey) {
     return new Response('Turnstile not configured', { status: 500 });
   }
-  return new Response(getTurnstileHTML(siteKey), {
+  return new Response(getTurnstileHTML(siteKey, redirectPath), {
     headers: { 'Content-Type': 'text/html; charset=utf-8' }
   });
 }
@@ -71,7 +79,7 @@ export async function handleTurnstileVerify(request, env) {
     });
   }
   
-  const { token } = body;
+  const { token, redirect } = body;
 
   if (!token || typeof token !== 'string' || token.length > 2048) {
     return new Response(JSON.stringify({ success: false, error: 'Invalid token' }), {
@@ -102,7 +110,8 @@ export async function handleTurnstileVerify(request, env) {
 
   if (outcome.success) {
     const sessionId = await createSession(env);
-    return new Response(JSON.stringify({ success: true, redirect: '/', sessionToken: sessionId }), {
+    const safeRedirect = sanitizeRedirect(redirect);
+    return new Response(JSON.stringify({ success: true, redirect: safeRedirect, sessionToken: sessionId }), {
       headers: {
         ...corsHeaders,
         'Content-Type': 'application/json',
@@ -126,7 +135,8 @@ export async function requireTurnstile(request, env) {
   const valid = await isSessionValid(sessionId, env);
 
   if (!valid) {
-    return handleTurnstilePage(env);
+    const url = new URL(request.url);
+    return handleTurnstilePage(env, url.pathname);
   }
 
   return null;

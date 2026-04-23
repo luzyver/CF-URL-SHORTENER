@@ -107,6 +107,10 @@ export default {
         if (!/^[a-zA-Z0-9_-]+$/.test(slug)) {
           return new Response(get404HTML(), { status: 404, headers: htmlHeaders });
         }
+        const turnstileResponse = await requireTurnstile(request, env);
+        if (turnstileResponse) {
+          return wrapWithHtmlHeaders(turnstileResponse);
+        }
         return await handleRedirect(slug, env);
       }
 
