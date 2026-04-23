@@ -33,6 +33,37 @@ const apiHeaders = {
  * with the full set of HTML security headers, preserving the original status
  * code and any headers already set by the turnstile module.
  */
+// Known link-preview and indexing crawlers — these cannot complete a
+// Turnstile challenge, so we let them through directly to the redirect.
+const CRAWLER_UA = [
+  'facebookexternalhit',
+  'facebookcatalog',
+  'twitterbot',
+  'telegrambot',
+  'whatsapp',
+  'slackbot',
+  'slack-imgproxy',
+  'linkedinbot',
+  'discordbot',
+  'pinterest',
+  'googlebot',
+  'bingbot',
+  'applebot',
+  'redditbot',
+  'iframely',
+  'embedly',
+  'vkshare',
+  'line-poker',
+  'sogou',
+  'tumblr',
+  'skypeuripreview',
+];
+
+function isCrawler(request) {
+  const ua = (request.headers.get('User-Agent') || '').toLowerCase();
+  return CRAWLER_UA.some(bot => ua.includes(bot));
+}
+
 function wrapWithHtmlHeaders(response) {
   const headers = new Headers(response.headers);
   for (const [key, value] of Object.entries(htmlHeaders)) {
@@ -107,9 +138,13 @@ export default {
         if (!/^[a-zA-Z0-9_-]+$/.test(slug)) {
           return new Response(get404HTML(), { status: 404, headers: htmlHeaders });
         }
-        const turnstileResponse = await requireTurnstile(request, env);
-        if (turnstileResponse) {
-          return wrapWithHtmlHeaders(turnstileResponse);
+        // Skip Turnstile for known link-preview bots so OG metadata
+        // can be fetched from the destination URL.
+        if (!isCrawler(request)) {
+          const turnstileResponse = await requireTurnstile(request, env);
+          if (turnstileResponse) {
+            return wrapWithHtmlHeaders(turnstileResponse);
+          }
         }
         return await handleRedirect(slug, env);
       }
