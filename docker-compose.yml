@@ -1,6 +1,7 @@
 services:
   app:
     build: .
+    container_name: lzvr-short
     expose:
       - "3000"
     environment:
