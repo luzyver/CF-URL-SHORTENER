@@ -1,14 +1,13 @@
 {
-  "name": "cf-url-shortener",
-  "version": "1.0.0",
-  "description": "URL Shortener with Cloudflare Workers and KV",
-  "main": "src/index.js",
+  "name": "lzvr-short",
+  "version": "2.0.0",
+  "description": "URL Shortener — Bun + Hono + Redis",
   "scripts": {
-    "dev": "wrangler dev",
-    "deploy": "wrangler deploy",
-    "tail": "wrangler tail"
+    "dev": "bun --watch src/index.js",
+    "start": "bun src/index.js"
   },
-  "devDependencies": {
-    "wrangler": "^4.54.0"
+  "dependencies": {
+    "hono": "^4.7.0",
+    "ioredis": "^5.4.2"
   }
 }

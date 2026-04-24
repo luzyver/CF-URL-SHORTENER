@@ -1,0 +1,39 @@
+services:
+  app:
+    build: .
+    expose:
+      - "3000"
+    environment:
+      PORT: "3000"
+      REDIS_URL: "redis://redis:6379"
+      ADMIN_API_KEY: "${ADMIN_API_KEY}"
+      TURNSTILE_SITE_KEY: "${TURNSTILE_SITE_KEY:-}"
+      TURNSTILE_SECRET_KEY: "${TURNSTILE_SECRET_KEY:-}"
+    depends_on:
+      redis:
+        condition: service_healthy
+    restart: unless-stopped
+    networks:
+      - nginx_default
+
+  redis:
+    image: redis:7-alpine
+    volumes:
+      - ./redis-data:/data
+    command: >
+      redis-server
+      --appendonly yes
+      --maxmemory 128mb
+      --maxmemory-policy allkeys-lru
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+    restart: unless-stopped
+    networks:
+      - nginx_default
+
+networks:
+  nginx_default:
+    external: true
